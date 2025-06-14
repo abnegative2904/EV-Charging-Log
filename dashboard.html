@@ -12,54 +12,75 @@
       background-color: #f3f3f3;
     }
 
-    h1, h2 {
+    h1 {
       color: #2c3e50;
+      margin-bottom: 10px;
     }
 
     #welcome-msg {
       font-size: 1.5em;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
-    button {
-      padding: 12px 20px;
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .button-container button {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 24px;
       background-color: #3498db;
       color: white;
       border: none;
       border-radius: 6px;
-      margin: 10px 5px 20px 0;
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: 600;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    .button-container button:hover {
       background-color: #2980b9;
     }
 
     #status, #amount {
       font-weight: bold;
       color: #2980b9;
-      margin-top: 10px;
+      margin: 10px 0 15px;
     }
 
     .instructions {
       background: #fff;
-      border-left: 5px solid #3498db;
-      padding: 15px 20px;
-      border-radius: 8px;
-      margin-top: 20px;
-      font-size: 15px;
-      color: #333;
+      border-left: 4px solid #3498db;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 25px;
     }
 
     .instructions h3 {
       margin-top: 0;
+      font-size: 16px;
       color: #2c3e50;
     }
 
     .instructions ul {
-      margin: 10px 0 0 20px;
-      padding-left: 0;
+      padding-left: 20px;
+      margin: 8px 0 0;
+    }
+
+    .instructions li {
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-top: 10px;
     }
 
     ul {
@@ -73,13 +94,20 @@
     }
 
     @media (max-width: 600px) {
+      .button-container {
+        flex-direction: column;
+      }
+
       h1, h2 {
         font-size: 1.2em;
       }
 
-      button {
+      .button-container button {
         width: 100%;
-        margin: 10px 0;
+      }
+
+      .instructions {
+        font-size: 13px;
       }
     }
   </style>
@@ -87,27 +115,29 @@
 <body>
   <h1 id="welcome-msg">Hi, <span id="username">User</span> 👋</h1>
 
-  <button onclick="startCharging()">Start Charging</button>
-  <button onclick="stopCharging()">Stop Charging</button>
+  <div class="button-container">
+    <button onclick="startCharging()">Start Charging</button>
+    <button onclick="stopCharging()">Stop Charging</button>
+  </div>
 
   <div id="status">Status: Waiting for action</div>
   <div id="amount"></div>
-
-  <h2>🔌 Charging History</h2>
-  <ul id="history"></ul>
 
   <div class="instructions">
     <h3>📋 Instructions</h3>
     <ul>
       <li>Welcome to <strong>EV CLUB Charging Station</strong>.</li>
-      <li>Please connect your charger to the designated socket in the lab.</li>
-      <li>Click <strong>Start Charging</strong> and <strong>Stop Charging</strong> to mark your session.</li>
-      <li>You can close this app once charging has started.</li>
-      <li>To charge again later, just log back in.</li>
+      <li>Connect your charger at the lab's charging socket.</li>
+      <li>Tap <strong>Start Charging</strong> and later <strong>Stop Charging</strong>.</li>
+      <li>You may close the app after starting your session.</li>
+      <li>Re-login to continue charging later if needed.</li>
       <li>Charging rate: ₹15/hour.</li>
-      <li>Make payment via UPI to the AIT EV Club account.</li>
+      <li>Pay via UPI to AIT EV Club account.</li>
     </ul>
   </div>
+
+  <h2>🔌 Charging History</h2>
+  <ul id="history"></ul>
 
   <script type="module" src="./app.js"></script>
   <script>
