@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EV Station Dashboard</title>
   <style>
@@ -10,29 +10,15 @@
       margin: 0;
       padding: 20px;
       background-color: #f3f3f3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
 
-    .logo {
-      margin-bottom: 10px;
-    }
-
-    .logo img {
-      height: 60px;
-    }
-
-    h1 {
+    h1, h2 {
       color: #2c3e50;
-      font-size: 24px;
-      margin-bottom: 10px;
-      text-align: center;
     }
 
-    h2 {
-      color: #2c3e50;
-      margin-top: 30px;
+    #welcome-msg {
+      font-size: 1.5em;
+      margin-bottom: 10px;
     }
 
     button {
@@ -41,7 +27,7 @@
       color: white;
       border: none;
       border-radius: 6px;
-      margin: 10px 5px;
+      margin: 10px 5px 20px 0;
       font-size: 16px;
       cursor: pointer;
     }
@@ -56,45 +42,34 @@
       margin-top: 10px;
     }
 
-    h4 {
+    .instructions {
+      background: #fff;
+      border-left: 5px solid #3498db;
+      padding: 15px 20px;
+      border-radius: 8px;
       margin-top: 20px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .instructions h3 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    .instructions ul {
+      margin: 10px 0 0 20px;
+      padding-left: 0;
     }
 
     ul {
       list-style: none;
       padding: 0;
-      max-width: 500px;
-      width: 100%;
     }
 
     li {
       padding: 6px 0;
       border-bottom: 1px solid #ddd;
-    }
-
-    .info-box {
-      background-color: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 15px 20px;
-      margin-top: 20px;
-      max-width: 600px;
-      font-size: 14px;
-      color: #444;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-
-    .info-box h3 {
-      margin-top: 0;
-      color: #2c3e50;
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    .info-box ul {
-      padding-left: 20px;
-      margin: 0;
-      list-style: disc;
     }
 
     @media (max-width: 600px) {
@@ -106,34 +81,14 @@
         width: 100%;
         margin: 10px 0;
       }
-
-      .info-box {
-        width: 90%;
-      }
     }
   </style>
 </head>
 <body>
-
-  <div class="logo">
-    <img src="evclub.png" alt="EV Club Logo">
-  </div>
-
-  <h1>Welcome to EV CLUB Charging Station</h1>
+  <h1 id="welcome-msg">Hi, <span id="username">User</span> 👋</h1>
 
   <button onclick="startCharging()">Start Charging</button>
   <button onclick="stopCharging()">Stop Charging</button>
-
-  <div class="info-box">
-    <h3>Instructions</h3>
-    <ul>
-      <li>Connect your charger to the designated lab socket.</li>
-      <li>Tap <strong>Start Charging</strong> to begin and <strong>Stop Charging</strong> when done.</li>
-      <li>You may close the app while charging is active. Re-login to stop it later.</li>
-      <li>Charging cost is <strong>₹15 per hour</strong>.</li>
-      <li>Pay via UPI to the official AIT account using the QR code available in the lab.</li>
-    </ul>
-  </div>
 
   <div id="status">Status: Waiting for action</div>
   <div id="amount"></div>
@@ -141,6 +96,23 @@
   <h2>🔌 Charging History</h2>
   <ul id="history"></ul>
 
+  <div class="instructions">
+    <h3>📋 Instructions</h3>
+    <ul>
+      <li>Welcome to <strong>EV CLUB Charging Station</strong>.</li>
+      <li>Please connect your charger to the designated socket in the lab.</li>
+      <li>Click <strong>Start Charging</strong> and <strong>Stop Charging</strong> to mark your session.</li>
+      <li>You can close this app once charging has started.</li>
+      <li>To charge again later, just log back in.</li>
+      <li>Charging rate: ₹15/hour.</li>
+      <li>Make payment via UPI to the AIT EV Club account.</li>
+    </ul>
+  </div>
+
   <script type="module" src="./app.js"></script>
+  <script>
+    const name = localStorage.getItem("username") || "User";
+    document.getElementById("username").textContent = name;
+  </script>
 </body>
 </html>
