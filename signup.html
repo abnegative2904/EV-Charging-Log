@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up</title>
+  <title>Admin Panel</title>
   <style>
     * {
       box-sizing: border-box;
@@ -17,6 +17,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       min-height: 100vh;
       padding: 20px;
     }
@@ -28,13 +29,12 @@
       box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 350px;
+      text-align: center;
     }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
+    h2, h3 {
+      margin-bottom: 15px;
       color: #2c3e50;
-      font-size: 22px;
     }
 
     input {
@@ -61,17 +61,45 @@
     button:hover {
       background-color: #2980b9;
     }
+
+    #admin-section {
+      margin-top: 30px;
+      width: 100%;
+      max-width: 350px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #admin-logs {
+      list-style-type: none;
+      padding: 0;
+      max-height: 250px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    #admin-logs li {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>User Sign Up</h2>
-    <input type="text" id="signup-name" placeholder="Full Name" />
-    <input type="text" id="signup-contact" placeholder="Contact Number" />
-    <input type="text" id="signup-uid" placeholder="User ID" />
-    <input type="password" id="signup-password" placeholder="Password" />
-    <button onclick="signup()">Sign Up</button>
+    <h2>Admin Login</h2>
+    <input type="text" id="admin-id" placeholder="Admin ID" />
+    <input type="password" id="admin-pass" placeholder="Admin Password" />
+    <button onclick="adminLogin()">Login</button>
   </div>
+
+  <div id="admin-section" style="display:none;">
+    <h3>All Charging Logs</h3>
+    <ul id="admin-logs"></ul>
+  </div>
+
   <script type="module" src="./app.js"></script>
 </body>
 </html>
