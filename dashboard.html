@@ -11,12 +11,26 @@
       padding: 20px;
       background-color: #f3f3f3;
     }
+
     h1, h2 {
       color: #2c3e50;
     }
-    #welcome-msg {
+
+    .logo {
+      text-align: center;
       margin-bottom: 20px;
     }
+
+    .logo img {
+      max-height: 80px;
+    }
+
+    #description {
+      margin: 15px 0 25px 0;
+      font-size: 16px;
+      color: #444;
+    }
+
     button {
       padding: 12px 20px;
       background-color: #3498db;
@@ -25,45 +39,71 @@
       border-radius: 6px;
       margin: 10px 5px 20px 0;
       font-size: 16px;
+      cursor: pointer;
     }
+
     button:hover {
       background-color: #2980b9;
     }
+
     #status, #amount {
       font-weight: bold;
       color: #2980b9;
       margin-top: 10px;
     }
+
     h4 {
       margin-top: 20px;
     }
+
     ul {
       list-style: none;
       padding: 0;
     }
+
     li {
       padding: 6px 0;
       border-bottom: 1px solid #ddd;
     }
+
     @media (max-width: 600px) {
       h1, h2, h4 {
         font-size: 1.2em;
       }
+
       button {
         width: 100%;
         margin: 10px 0;
+      }
+
+      #description {
+        font-size: 14px;
       }
     }
   </style>
 </head>
 <body>
-  <h1 id="welcome-msg">Welcome!</h1>
+  <div class="logo">
+    <img src="evclub.png" alt="EV Club Logo" />
+  </div>
+
+  <h1>Welcome to EV CLUB Charging Station</h1>
+  <div id="description">
+    Please connect your charger to the socket provided at the lab and mark your start and stop of charging.<br/>
+    You can close the app once you initiate the charging. You can log in again to continue.<br/>
+    The rate of charging is <strong>₹15/hour</strong>. Deposit the amount via UPI scanner to AIT's account.
+  </div>
+
+  <h2 id="welcome-msg">Welcome!</h2>
   <button onclick="startCharging()">Start Charging</button>
   <button onclick="stopCharging()">Stop Charging</button>
+
   <div id="status">Status: Waiting for action</div>
   <div id="amount"></div>
+
   <h2>🔌 Charging History</h2>
   <ul id="history"></ul>
+
   <script type="module" src="./app.js"></script>
 </body>
 </html>
