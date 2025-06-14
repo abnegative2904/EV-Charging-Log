@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EV Station Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f3f3f3;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    #welcome-msg {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      margin: 10px 5px 20px 0;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #2980b9;
+    }
+    #status, #amount {
+      font-weight: bold;
+      color: #2980b9;
+      margin-top: 10px;
+    }
+    h4 {
+      margin-top: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    @media (max-width: 600px) {
+      h1, h2, h4 {
+        font-size: 1.2em;
+      }
+      button {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 id="welcome-msg">Welcome!</h1>
+  <button onclick="startCharging()">Start Charging</button>
+  <button onclick="stopCharging()">Stop Charging</button>
+  <div id="status">Status: Waiting for action</div>
+  <div id="amount"></div>
+  <h2>🔌 Charging History</h2>
+  <ul id="history"></ul>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
