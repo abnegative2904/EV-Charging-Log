@@ -1,77 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up</title>
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
 
-    body {
+    body, html {
       font-family: 'Segoe UI', sans-serif;
-      background: #f3f3f3;
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: url('m-0576-charger.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: blur(8px);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: -1;
+    }
+
+    .hamburger {
+      position: fixed;
+        display: inline-block;
+       width: auto;                   /* 👈 Prevent any stretch */
+      max-width: none;
+      top: 20px;
+      left: 20px;
+      font-size: 28px;
+      background: rgba(52, 152, 219, 0.9);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: white;
+      padding: 60px 20px;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+
+    .side-panel a {
+      display: block;
+      margin: 20px 0;
+      font-size: 18px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .side-panel a:hover {
+      color: #27ae60;
+    }
+
+    .main {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 100px 20px 50px;
     }
 
     .container {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.35);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      color: #2c3e50;
+      max-width: 400px;
       width: 100%;
-      max-width: 350px;
     }
 
     h2 {
-      text-align: center;
       margin-bottom: 20px;
-      color: #2c3e50;
-      font-size: 22px;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: start;
       font-size: 14px;
+      margin-top: 5px;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background-color: #3498db;
-      color: white;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      padding: 12px;
       margin-top: 10px;
+      background: #27ae60;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
     }
 
     button:hover {
-      background-color: #2980b9;
+      background: #219150;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #e74c3c;
+    }
+
+    .contact-section {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px 20px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .contact-section h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .contact-section p {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #spinner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinner-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .spinner-box img {
+      width: 80px;
+      height: auto;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 30px 20px;
+      }
+
+      .hamburger {
+        font-size: 20px;
+        padding: 6px 10px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>User Sign Up</h2>
-    <input type="text" id="signup-name" placeholder="Full Name" />
-    <input type="text" id="signup-contact" placeholder="Contact Number" />
-    <input type="text" id="signup-uid" placeholder="User ID" />
-    <input type="password" id="signup-password" placeholder="Password" />
-    <button onclick="signup()">Sign Up</button>
+
+  <!-- Hamburger -->
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+
+  <div class="side-panel" id="sideMenu">
+    <a href="index.html">Home</a>
+    <a href="index.html#about">About Us</a>
   </div>
-  <script type="module" src="./app.js"></script>
+
+  <!-- Loading Spinner -->
+  <div id="spinner">
+    <div class="spinner-box">
+      <img src="Loading.gif" alt="Loading..." />
+    </div>
+  </div>
+
+  <!-- Signup Form -->
+  <div class="main">
+    <div class="container">
+      <h2>Create Account</h2>
+      <form onsubmit="signup(); return false;">
+        <input type="text" id="signup-name" placeholder="Full Name" required />
+        <input type="text" id="signup-contact" placeholder="Contact Number" required />
+        <input type="text" id="signup-uid" placeholder="User ID" required />
+        <input type="password" id="signup-password" placeholder="Password" required />
+        <input type="password" id="signup-confirm" placeholder="Confirm Password" required />
+        <button type="submit">Sign Up</button>
+        <p style="margin-top: 12px; font-size: 14px;">
+          Already a user? <a href="login.html" style="color: #2980b9; font-weight: bold; text-decoration: none;">Login here</a>
+        </p>
+        <p id="status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Contact Footer -->
+  <div class="contact-section" id="about">
+    <h2>Contact & About Us</h2>
+    <p><strong>Email:</strong> evclub2019@gmail.com</p>
+    <p><strong>Phone:</strong> +91-9852232044</p>
+    <p>We are a student-driven initiative from AIT dedicated to sustainable electric mobility solutions. Our EV Club fosters innovation in charging infrastructure, vehicle prototyping, and smart transport systems.</p>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="app.js"></script>
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("sideMenu");
+      menu.style.left = menu.style.left === "0px" ? "-250px" : "0px";
+    }
+
+    function togglePassword() {
+      const pass = document.getElementById("signup-password");
+      const confirm = document.getElementById("signup-confirm");
+      const type = pass.type === "password" ? "text" : "password";
+      pass.type = confirm.type = type;
+    }
+
+    window.addEventListener("load", () => {
+      const spinner = document.getElementById("spinner");
+      spinner.style.display = "flex";
+      setTimeout(() => spinner.style.display = "none", 800);
+    });
+
+    // You can also validate password match inside app.js's signup function if needed
+  </script>
 </body>
 </html>

@@ -13,99 +13,151 @@ import {
 
 import { db } from "./firebase-config.js";
 
-// Global variables
+// Spinner Helper
+function showLoading(show) {
+  const spinner = document.getElementById("spinner") || document.getElementById("loading-popup");
+  if (spinner) spinner.style.display = show ? "flex" : "none";
+}
+
 let userId = localStorage.getItem("userId") || null;
 let startTime = null;
 
-// ---------------- SIGNUP ------------------
+// -------- SIGNUP --------
 window.signup = async function () {
-  const name = document.getElementById("signup-name").value;
-  const contact = document.getElementById("signup-contact").value;
-  const uid = document.getElementById("signup-uid").value;
-  const password = document.getElementById("signup-password").value;
+  const name = document.getElementById("signup-name").value.trim();
+  const contact = document.getElementById("signup-contact").value.trim();
+  const uid = document.getElementById("signup-uid").value.trim();
+  const password = document.getElementById("signup-password").value.trim();
+  const confirmPassword = document.getElementById("signup-confirm").value.trim();
+  const status = document.getElementById("status");
 
-  if (!name || !contact || !uid || !password) {
-    alert("Please fill in all fields.");
+  // Basic field check
+  if (!name || !contact || !uid || !password || !confirmPassword) {
+    status.textContent = "Please fill all fields.";
+    status.style.color = "#e74c3c";
     return;
   }
 
-  const q = query(collection(db, "accounts"), where("uid", "==", uid));
-  const querySnapshot = await getDocs(q);
-
-  if (!querySnapshot.empty) {
-    alert("User ID already exists!");
+  // Password match check
+  if (password !== confirmPassword) {
+    status.textContent = "Passwords do not match.";
+    status.style.color = "#e74c3c";
     return;
   }
 
-  await addDoc(collection(db, "accounts"), {
-    name,
-    contact,
-    uid,
-    password,
-    timestamp: serverTimestamp()
-  });
+  try {
+    showLoading(true);
+    const q = query(collection(db, "accounts"), where("uid", "==", uid));
+    const result = await getDocs(q);
 
-  alert("Sign up successful! Please login.");
-  window.location.href = "login.html";
+    if (!result.empty) {
+      status.textContent = "User ID already exists.";
+      status.style.color = "#e74c3c";
+      return;
+    }
+
+    await addDoc(collection(db, "accounts"), {
+      name, contact, uid, password,
+      timestamp: serverTimestamp()
+    });
+
+    status.textContent = "Signup successful!";
+    status.style.color = "#27ae60";
+    setTimeout(() => window.location.href = "login.html", 1000);
+  } catch (err) {
+    console.error("Signup error:", err);
+    status.textContent = "Error during signup.";
+    status.style.color = "#e74c3c";
+  } finally {
+    showLoading(false);
+  }
 };
 
-// ---------------- LOGIN ------------------
+
+// -------- LOGIN --------
 window.login = async function () {
-  const uid = document.getElementById("login-uid").value;
-  const password = document.getElementById("login-password").value;
+  const uid = document.getElementById("login-uid").value.trim();
+  const password = document.getElementById("login-password").value.trim();
+  const status = document.getElementById("status");
 
-  const q = query(collection(db, "accounts"), where("uid", "==", uid));
-  const querySnapshot = await getDocs(q);
-
-  if (
-    querySnapshot.empty ||
-    querySnapshot.docs[0].data().password !== password
-  ) {
-    alert("Invalid credentials.");
+  if (!uid || !password) {
+    status.textContent = "Enter credentials.";
     return;
   }
 
-  userId = querySnapshot.docs[0].id;
-  localStorage.setItem("userId", userId);
+  try {
+    showLoading(true);
+    const q = query(collection(db, "accounts"), where("uid", "==", uid));
+    const snap = await getDocs(q);
 
-  alert("Login successful!");
-  window.location.href = "dashboard.html";
+    if (snap.empty) {
+      status.textContent = "User not found!";
+      return;
+    }
+
+    const userDoc = snap.docs[0];
+    const user = userDoc.data();
+
+    if (user.password === password) {
+      userId = userDoc.id;
+      localStorage.setItem("userId", userId);
+      status.textContent = "Login successful!";
+      setTimeout(() => window.location.href = "dashboard.html", 1000);
+    } else {
+      status.textContent = "Invalid password.";
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    status.textContent = "Login failed.";
+  } finally {
+    showLoading(false);
+  }
 };
 
-// ---------------- ADMIN LOGIN ------------------
+// -------- ADMIN LOGIN --------
 window.adminLogin = function () {
-  const adminId = document.getElementById("admin-id").value;
-  const adminPass = document.getElementById("admin-pass").value;
+  const id = document.getElementById("admin-id").value;
+  const pass = document.getElementById("admin-pass").value;
+  const status = document.getElementById("status");
 
-  if (adminId === "admin" && adminPass === "admin123") {
+  if (id === "admin" && pass === "admin123") {
+    document.getElementById("login-container").style.display = "none";
     document.getElementById("admin-section").style.display = "block";
-    loadAllLogs();
+    status.textContent = "Admin login successful.";
+    showLoading(true);
+    loadAllLogs().then(() => showLoading(false));
   } else {
-    alert("Invalid admin credentials.");
+    status.textContent = "Invalid credentials.";
   }
 };
 
-// ---------------- START CHARGING ------------------
+// -------- ADMIN LOGOUT --------
+window.adminLogout = function () {
+  document.getElementById("login-container").style.display = "block";
+  document.getElementById("admin-section").style.display = "none";
+  document.getElementById("status").textContent = "";
+};
+
+// -------- START CHARGING --------
 window.startCharging = async function () {
+  const status = document.getElementById("status");
   if (!userId) {
-    alert("Please login first.");
+    status.textContent = "❌ Please login.";
     return;
   }
 
-  // Check if a session already exists
-  const q = query(
-    collection(db, "charging_logs"),
-    where("userId", "==", userId),
-    where("endTime", "==", null)
-  );
-  const querySnapshot = await getDocs(q);
-  if (!querySnapshot.empty) {
-    alert("Charging already in progress.");
+  const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
+  const result = await getDocs(q);
+
+  if (!result.empty) {
+    status.textContent = "⚡ Charging already started.";
     return;
   }
 
   const start = new Date();
   startTime = start;
+
+  showLoading(true);
   await addDoc(collection(db, "charging_logs"), {
     userId,
     startTime: start,
@@ -114,169 +166,143 @@ window.startCharging = async function () {
     amount: null,
     timestamp: serverTimestamp()
   });
+  showLoading(false);
 
-  document.getElementById("status").textContent =
-    "Charging started at " + start.toLocaleTimeString();
+  status.textContent = "⚡ Charging started at " + start.toLocaleTimeString();
 };
 
-// ---------------- STOP CHARGING ------------------
+// -------- STOP CHARGING --------
 window.stopCharging = async function () {
-  const q = query(
-    collection(db, "charging_logs"),
-    where("userId", "==", userId),
-    where("endTime", "==", null)
-  );
-  const querySnapshot = await getDocs(q);
+  const status = document.getElementById("status");
+  const amountBox = document.getElementById("amount");
 
-  if (querySnapshot.empty) {
-    alert("No active session found.");
+  const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
+  const result = await getDocs(q);
+
+  if (result.empty) {
+    status.textContent = "No active session.";
     return;
   }
 
-  const docRef = querySnapshot.docs[0].ref;
-  const data = querySnapshot.docs[0].data();
+  const ref = result.docs[0].ref;
+  const data = result.docs[0].data();
   const start = data.startTime.toDate();
   const end = new Date();
+  const duration = (end - start) / 1000;
+  const rate = 15 / 3600;
+  const cost = duration * rate;
 
-  const duration = (end - start) / 1000; // in seconds
-  const rate = 15 / 3600; // ₹15 per hour = ₹0.0041667 per second
-  const amount = duration * rate;
-
-  await updateDoc(docRef, {
+  showLoading(true);
+  await updateDoc(ref, {
     endTime: end,
     duration,
-    amount
+    amount: cost
   });
+  showLoading(false);
 
-  document.getElementById("status").textContent =
-    `Charging stopped at ${end.toLocaleTimeString()}`;
-  document.getElementById("amount").textContent =
-    `Total Amount: ₹${amount.toFixed(2)}`;
+  status.textContent = ` Charging stopped. ₹${cost.toFixed(2)} charged.`;
+  if (amountBox) amountBox.textContent = `Total: ₹${cost.toFixed(2)}`;
 
-  startTime = null;
   loadUserHistory();
 };
 
-// ---------------- LOAD USER HISTORY ------------------
+// -------- USER HISTORY --------
 window.loadUserHistory = async function () {
-  if (!userId) return;
-
-  const q = query(collection(db, "charging_logs"), where("userId", "==", userId));
-  const querySnapshot = await getDocs(q);
   const list = document.getElementById("history");
-  if (!list) return;
+  if (!list || !userId) return;
 
   list.innerHTML = "";
-  const groupedLogs = {};
 
-  querySnapshot.forEach((doc) => {
+  const q = query(collection(db, "charging_logs"), where("userId", "==", userId));
+  const snap = await getDocs(q);
+
+  const logsByDate = {};
+
+  snap.forEach(doc => {
     const data = doc.data();
     if (!data.startTime) return;
 
     const date = data.startTime.toDate();
-    const dateStr = date.toDateString();
-    if (!groupedLogs[dateStr]) groupedLogs[dateStr] = [];
+    const key = date.toDateString();
+    if (!logsByDate[key]) logsByDate[key] = [];
 
-    groupedLogs[dateStr].push({
+    logsByDate[key].push({
       time: date.toLocaleTimeString(),
       amount: data.amount ? data.amount.toFixed(2) : "--"
     });
   });
 
-  for (const date in groupedLogs) {
+  for (const date in logsByDate) {
     const dateHeader = document.createElement("h4");
     dateHeader.textContent = `📅 ${date}`;
     list.appendChild(dateHeader);
 
-    groupedLogs[date].forEach((log) => {
+    logsByDate[date].forEach(entry => {
       const li = document.createElement("li");
-      li.textContent = `• Start: ${log.time} | Amount: ₹${log.amount}`;
+      li.textContent = `• Start: ${entry.time} | Amount: ₹${entry.amount}`;
       list.appendChild(li);
     });
   }
 };
 
-// ---------------- LOAD ALL LOGS FOR ADMIN ------------------
+// -------- ADMIN LOGS --------
 window.loadAllLogs = async function () {
-  const logsRef = collection(db, "charging_logs");
-  const q = query(logsRef, orderBy("startTime", "desc"));
-  const querySnapshot = await getDocs(q);
+  const list = document.getElementById("admin-logs");
+  if (!list) return;
 
-  const adminList = document.getElementById("admin-logs");
-  adminList.innerHTML = "";
+  list.innerHTML = "";
+  const q = query(collection(db, "charging_logs"), orderBy("startTime", "desc"));
+  const snap = await getDocs(q);
 
-  const groupedLogs = {};
+  const grouped = {};
 
-  for (const docSnap of querySnapshot.docs) {
+  for (const docSnap of snap.docs) {
     const data = docSnap.data();
     if (!data.startTime) continue;
+
     const date = data.startTime.toDate();
-    const dateStr = date.toDateString();
+    const dateKey = date.toDateString();
+    if (!grouped[dateKey]) grouped[dateKey] = [];
 
-    const userDoc = await getDoc(doc(db, "accounts", data.userId));
-    const username = userDoc.exists() ? userDoc.data().name : data.userId;
+    const userRef = doc(db, "accounts", data.userId);
+    const userDoc = await getDoc(userRef);
+    const username = userDoc.exists() ? userDoc.data().name : "Unknown";
 
-    if (!groupedLogs[dateStr]) groupedLogs[dateStr] = [];
-    groupedLogs[dateStr].push({
+    grouped[dateKey].push({
       name: username,
       time: date.toLocaleTimeString(),
       amount: data.amount ? data.amount.toFixed(2) : "--"
     });
   }
 
-  for (const date in groupedLogs) {
+  for (const date in grouped) {
     const dateHeader = document.createElement("h4");
     dateHeader.textContent = `📅 ${date}`;
-    adminList.appendChild(dateHeader);
+    list.appendChild(dateHeader);
 
-    groupedLogs[date].forEach((log) => {
+    grouped[date].forEach(log => {
       const li = document.createElement("li");
       li.textContent = `• ${log.name} | Start: ${log.time} | Amount: ₹${log.amount}`;
-      adminList.appendChild(li);
+      list.appendChild(li);
     });
   }
 };
 
-// ---------------- SHOW WELCOME NAME ------------------
-async function showWelcomeName() {
-  const userDoc = await getDoc(doc(db, "accounts", userId));
-  if (userDoc.exists()) {
-    const name = userDoc.data().name;
-    const welcomeEl = document.getElementById("welcome-msg");
-    if (welcomeEl) welcomeEl.textContent = `Welcome, ${name}!`;
-
-    // Check for ongoing session
-    const q = query(
-      collection(db, "charging_logs"),
-      where("userId", "==", userId),
-      where("endTime", "==", null)
-    );
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const start = querySnapshot.docs[0].data().startTime.toDate();
-      const ageMs = new Date() - start;
-      if (ageMs < 8 * 60 * 60 * 1000) {
-        document.getElementById("status").textContent =
-          "Charging started at " + start.toLocaleTimeString();
-      } else {
-        // Auto-expire session
-        await updateDoc(querySnapshot.docs[0].ref, {
-          endTime: start,
-          duration: 0,
-          amount: 0
-        });
-      }
-    }
-  }
-}
-
-// ---------------- AUTO LOAD ON DASHBOARD ------------------
+// -------- AUTO INIT ON DASHBOARD --------
 if (window.location.pathname.includes("dashboard.html")) {
   if (!userId) {
     alert("Please login first.");
     window.location.href = "login.html";
   } else {
-    showWelcomeName();
-    loadUserHistory();
+    (async () => {
+      const userDoc = await getDoc(doc(db, "accounts", userId));
+      if (userDoc.exists()) {
+        const name = userDoc.data().name;
+        const welcome = document.getElementById("welcome-msg");
+        if (welcome) welcome.textContent = `Welcome, ${name}!`;
+      }
+
+      await loadUserHistory();
+    })();
   }
 }

@@ -3,146 +3,245 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>EV Station Dashboard</title>
+  <title>Dashboard</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+
+    body, html {
       font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f3f3f3;
+      height: 100%;
+      overflow-x: hidden;
     }
 
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 10px;
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%;
+      width: 100%;
+      background-image: url('m-0576-charger.png');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -2;
     }
 
-    #welcome-msg {
-      font-size: 1.5em;
-      margin-bottom: 20px;
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: -1;
     }
 
-    .button-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .button-container button {
-      flex: 1;
-      min-width: 140px;
-      padding: 14px 24px;
-      background-color: #3498db;
+    .hamburger {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 28px;
+      background: rgba(39, 174, 96, 0.9);
       color: white;
       border: none;
-      border-radius: 6px;
-      font-size: 18px;
-      font-weight: 600;
+      border-radius: 8px;
+      padding: 8px 14px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      z-index: 1001;
+      width: auto;
     }
 
-    .button-container button:hover {
-      background-color: #2980b9;
+    .side-panel {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100%;
+      width: 250px;
+      background-color: white;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      padding: 60px 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
     }
 
-    #status, #amount {
-      font-weight: bold;
-      color: #2980b9;
-      margin: 10px 0 15px;
-    }
-
-    .instructions {
-      background: #fff;
-      border-left: 4px solid #3498db;
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 14px;
-      color: #444;
-      margin-bottom: 25px;
-    }
-
-    .instructions h3 {
-      margin-top: 0;
-      font-size: 16px;
+    .side-panel a {
+      display: block;
+      margin: 20px 0;
+      font-size: 18px;
       color: #2c3e50;
+      text-decoration: none;
+      font-weight: bold;
     }
 
-    .instructions ul {
-      padding-left: 20px;
-      margin: 8px 0 0;
+    .side-panel a:hover {
+      color: #27ae60;
     }
 
-    .instructions li {
-      margin-bottom: 4px;
+    .main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 100px 20px 50px;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.35);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(12px);
+      text-align: center;
+      color: #2c3e50;
+      max-width: 500px;
+      width: 100%;
     }
 
     h2 {
+      margin-bottom: 20px;
+    }
+
+    #status {
+      margin: 20px 0;
+      font-weight: bold;
+      color: #e67e22;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #219150;
+    }
+            .contact-section {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px 20px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+    }
+
+    .contact-section h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .contact-section p {
+      color: #555;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #amount {
+      font-size: 18px;
       color: #2c3e50;
       margin-top: 10px;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    ul#history {
+      margin-top: 20px;
+      text-align: left;
     }
 
-    li {
-      padding: 6px 0;
-      border-bottom: 1px solid #ddd;
+    ul#history li {
+      padding: 6px;
+      font-size: 15px;
     }
 
     @media (max-width: 600px) {
-      .button-container {
-        flex-direction: column;
+      .container {
+        padding: 30px 20px;
       }
 
-      h1, h2 {
-        font-size: 1.2em;
+      .hamburger {
+        font-size: 24px;
+        padding: 6px 10px;
       }
 
-      .button-container button {
-        width: 100%;
+      h2 {
+        font-size: 1.5rem;
       }
+    }
 
-      .instructions {
-        font-size: 13px;
-      }
+    /* Loading spinner */
+    #spinner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
     }
   </style>
 </head>
 <body>
-   <h1 id="welcome-msg">Welcome!</h1>
 
-  <div class="button-container">
-    <button onclick="startCharging()">Start Charging</button>
-    <button onclick="stopCharging()">Stop Charging</button>
+  <!-- Hamburger -->
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+
+  <!-- Side Menu -->
+  <div class="side-panel" id="sideMenu">
+    <a href="index.html">Home</a>
+    <a href="index.html#about">About Us</a>
+    <a href="login.html">Logout</a>
   </div>
 
-  <div id="status">Status: Waiting for action</div>
-  <div id="amount"></div>
+  <!-- Spinner -->
+  
 
-  <div class="instructions">
-    <h3>📋 Instructions</h3>
-    <ul>
-      <li>Welcome to <strong>EV CLUB Charging Station</strong>.</li>
-      <li>Connect your charger at the lab's charging socket.</li>
-      <li>Tap <strong>Start Charging</strong> and later <strong>Stop Charging</strong>.</li>
-      <li>You may close the app after starting your session.</li>
-      <li>Re-login to stop the charging session.</li>
-      <li>Charging rate: ₹15/hour.</li>
-      <li>Pay via UPI to AIT bank account ( QR available).</li>
-    </ul>
+  <!-- Main Content -->
+  <div class="main">
+    <div class="container">
+      <h2 id="welcome-msg">Welcome!</h2>
+
+      <p id="status">No active session</p>
+      <button onclick="startCharging()">Start Charging</button>
+      <button onclick="stopCharging()">Stop Charging</button>
+
+      <p id="amount"></p>
+
+      <h3 style="margin-top: 30px;">🔌 Charging History</h3>
+      <ul id="history"></ul>
+    </div>
   </div>
-
-  <h2>🔌 Charging History</h2>
-  <ul id="history"></ul>
+  <!-- Footer Contact Section -->
+  <div class="contact-section" id="about">
+    <h2>Contact & About Us</h2>
+    <p><strong>Email:</strong> evclub2019@gmail.com</p>
+    <p><strong>Phone:</strong> +91-9852232044</p>
+    <p>We are a student-driven initiative from AIT dedicated to sustainable electric mobility solutions. Our EV Club fosters innovation in charging infrastructure, vehicle prototyping, and smart transport systems.</p>
+  </div>
 
   <script type="module" src="./app.js"></script>
   <script>
-    const name = localStorage.getItem("username") || "User";
-    document.getElementById("username").textContent = name;
+    function toggleMenu() {
+      const menu = document.getElementById("sideMenu");
+      menu.style.left = menu.style.left === "0px" ? "-250px" : "0px";
+    }
+
+    window.addEventListener("load", () => {
+      const spinner = document.getElementById("spinner");
+      spinner.style.display = "flex";
+      setTimeout(() => spinner.style.display = "none", 700);
+    });
   </script>
 </body>
 </html>

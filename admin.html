@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel</title>
+  <title>Admin Panel - EV Charging</title>
   <style>
     * {
       box-sizing: border-box;
@@ -11,65 +11,129 @@
       padding: 0;
     }
 
-    body {
+    body, html {
       font-family: 'Segoe UI', sans-serif;
-      background: #f3f3f3;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      padding: 20px;
+      height: 100%;
+      overflow-x: hidden;
     }
 
-    .container {
-      background: white;
-      padding: 20px;
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%; width: 100%;
+      background-image: url('m-0576-charger.png');
+      background-size: cover;
+      background-position: center;
+      filter: blur(8px);
+      z-index: -2;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      height: 100%; width: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: -1;
+    }
+
+    .hamburger {
+      display: inline-block;
+       display: inline-block;
+       width: auto;                   /* 👈 Prevent any stretch */
+      max-width: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      font-size: 24px;
+      background: rgba(39, 174, 96, 0.9);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+
+    .side-panel {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: white;
+      padding: 60px 20px;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+      transition: left 0.3s ease;
+      z-index: 1000;
+    }
+
+    .side-panel a {
+      display: block;
+      margin: 20px 0;
+      font-size: 18px;
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .side-panel a:hover {
+      color: #27ae60;
+    }
+    
+
+    .container, #admin-section {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 25px 20px;
       border-radius: 10px;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 350px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 400px;
       text-align: center;
+      margin: 100px auto 20px;
     }
 
     h2, h3 {
-      margin-bottom: 15px;
+      margin-bottom: 16px;
       color: #2c3e50;
     }
 
     input {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
+      font-size: 16px;
     }
 
     button {
       width: 100%;
-      padding: 10px;
-      background-color: #3498db;
-      color: white;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+      padding: 12px;
       margin-top: 10px;
+      background: #27ae60;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
     }
 
     button:hover {
-      background-color: #2980b9;
+      background: #219150;
+    }
+
+    #logout-btn {
+      background-color: #e74c3c;
+    }
+
+    #logout-btn:hover {
+      background-color: #c0392b;
     }
 
     #admin-section {
-      margin-top: 30px;
-      width: 100%;
-      max-width: 350px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: none;
     }
 
     #admin-logs {
@@ -83,23 +147,89 @@
     #admin-logs li {
       padding: 8px;
       border-bottom: 1px solid #ccc;
-      font-size: 13px;
+      font-size: 14px;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    #spinner {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(255,255,255,0.8);
+      z-index: 9999;
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    @media (max-width: 600px) {
+      .container, #admin-section {
+        padding: 20px 15px;
+      }
+      .hamburger {
+        font-size: 20px;
+        padding: 6px 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+
+  <!-- Hamburger -->
+  <button class="hamburger" onclick="toggleMenu()">☰</button>
+
+  <!-- Side Menu -->
+  <div class="side-panel" id="sideMenu">
+    <a href="index.html">Home</a>
+    <a href="index.html#about">About Us</a>
+  </div>
+
+  <!-- Spinner -->
+  <div id="spinner">
+  <div class="spinner-box">
+    <img src="Loading.gif" alt="Loading..." />
+  </div>
+</div>
+
+  <!-- Admin Login -->
+  <div class="container" id="login-container">
     <h2>Admin Login</h2>
     <input type="text" id="admin-id" placeholder="Admin ID" />
     <input type="password" id="admin-pass" placeholder="Admin Password" />
     <button onclick="adminLogin()">Login</button>
+    <p id="status"></p>
   </div>
 
-  <div id="admin-section" style="display:none;">
-    <h3>All Charging Logs</h3>
+  <!-- Admin Logs -->
+  <div id="admin-section">
+    <h3>Charging Logs</h3>
     <ul id="admin-logs"></ul>
+    <button id="logout-btn" onclick="adminLogout()">Logout</button>
   </div>
 
+  <!-- JS -->
   <script type="module" src="./app.js"></script>
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("sideMenu");
+      menu.style.left = menu.style.left === "0px" ? "-250px" : "0px";
+    }
+
+    window.addEventListener("load", () => {
+      const spinner = document.getElementById("spinner");
+      spinner.style.display = "flex";
+      setTimeout(() => spinner.style.display = "none", 800);
+    });
+  </script>
 </body>
 </html>
