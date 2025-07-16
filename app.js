@@ -318,7 +318,20 @@ if (window.location.pathname.includes("dashboard.html")) {
         if (welcome) welcome.textContent = `Welcome, ${name}!`;
       }
 
-      await loadUserHistory();
+      // Restore active session
+const activeSessionQuery = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
+const activeSessionSnap = await getDocs(activeSessionQuery);
+if (!activeSessionSnap.empty) {
+  const data = activeSessionSnap.docs[0].data();
+  if (data.startTime) {
+    startTime = data.startTime.toDate();  // ✅ restore startTime for further usage
+    const status = document.getElementById("status");
+    status.textContent = "Charging in progress since " + startTime.toLocaleTimeString();
+  }
+}
+
+await loadUserHistory();
+
     })();
   }
 }
