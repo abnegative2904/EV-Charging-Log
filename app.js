@@ -146,65 +146,81 @@ window.startCharging = async function () {
     return;
   }
 
-  const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
-  const result = await getDocs(q);
+  showLoading(true); // Show loader at start
 
-  if (!result.empty) {
-    status.textContent = "⚡ Charging already started.";
-    return;
+  try {
+    const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
+    const result = await getDocs(q);
+
+    if (!result.empty) {
+      status.textContent = "⚡ Charging already started.";
+      return;
+    }
+
+    const start = new Date();
+    startTime = start;
+
+    await addDoc(collection(db, "charging_logs"), {
+      userId,
+      startTime: start,
+      endTime: null,
+      duration: null,
+      amount: null,
+      timestamp: serverTimestamp()
+    });
+
+    status.textContent = "⚡ Charging started at " + start.toLocaleTimeString();
+  } catch (err) {
+    console.error("Start charging error:", err);
+    status.textContent = "Error starting charging.";
+  } finally {
+    showLoading(false); // Hide loader
   }
-
-  const start = new Date();
-  startTime = start;
-
-  showLoading(true);
-  await addDoc(collection(db, "charging_logs"), {
-    userId,
-    startTime: start,
-    endTime: null,
-    duration: null,
-    amount: null,
-    timestamp: serverTimestamp()
-  });
-  showLoading(false);
-
-  status.textContent = "⚡ Charging started at " + start.toLocaleTimeString();
 };
+
 
 // -------- STOP CHARGING --------
 window.stopCharging = async function () {
   const status = document.getElementById("status");
   const amountBox = document.getElementById("amount");
 
-  const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
-  const result = await getDocs(q);
+  showLoading(true); // Show loader at start
 
-  if (result.empty) {
-    status.textContent = "No active session.";
-    return;
+  try {
+    const q = query(collection(db, "charging_logs"), where("userId", "==", userId), where("endTime", "==", null));
+    const result = await getDocs(q);
+
+    if (result.empty) {
+      status.textContent = "No active session.";
+      return;
+    }
+
+    const ref = result.docs[0].ref;
+    const data = result.docs[0].data();
+    const start = data.startTime.toDate();
+    const end = new Date();
+    const duration = (end - start) / 1000;
+    const rate = 15 / 3600;
+    const cost = duration * rate;
+
+    await updateDoc(ref, {
+      endTime: end,
+      duration,
+      amount: cost
+    });
+
+    status.textContent = ` Charging stopped. ₹${cost.toFixed(2)} charged.`;
+    if (amountBox) amountBox.textContent = `Total: ₹${cost.toFixed(2)}`;
+
+    loadUserHistory();
+  } catch (err) {
+    console.error("Stop charging error:", err);
+    status.textContent = "Error stopping charging.";
+  } finally {
+    showLoading(false); // Hide loader
   }
-
-  const ref = result.docs[0].ref;
-  const data = result.docs[0].data();
-  const start = data.startTime.toDate();
-  const end = new Date();
-  const duration = (end - start) / 1000;
-  const rate = 15 / 3600;
-  const cost = duration * rate;
-
-  showLoading(true);
-  await updateDoc(ref, {
-    endTime: end,
-    duration,
-    amount: cost
-  });
-  showLoading(false);
-
-  status.textContent = ` Charging stopped. ₹${cost.toFixed(2)} charged.`;
-  if (amountBox) amountBox.textContent = `Total: ₹${cost.toFixed(2)}`;
-
-  loadUserHistory();
 };
+
 
 // -------- USER HISTORY --------
 window.loadUserHistory = async function () {

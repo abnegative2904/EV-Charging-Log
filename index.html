@@ -57,17 +57,18 @@
     }
 
     .side-panel {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      height: 100%;
-      width: 250px;
-      background-color: white;
-      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-      padding: 60px 20px;
-      transition: left 0.3s ease;
-      z-index: 1000;
-    }
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  width: 250px;
+  height: 100%;
+  background-color: white;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 60px 20px;
+}
 
     .side-panel a {
       display: block;
@@ -220,9 +221,11 @@
   <!-- Script to Toggle Side Menu -->
   <script>
     function toggleMenu() {
-      const menu = document.getElementById("sideMenu");
-      menu.style.left = menu.style.left === "0px" ? "-250px" : "0px";
-    }
+  const menu = document.getElementById("sideMenu");
+  const isOpen = menu.style.transform === "translateX(0%)";
+  menu.style.transform = isOpen ? "translateX(-100%)" : "translateX(0%)";
+}
+
   </script>
 
 </body>

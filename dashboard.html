@@ -181,14 +181,24 @@
       position: fixed;
       top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(255,255,255,0.7);
-      backdrop-filter: blur(4px);
+      background: rgba(255, 255, 255, 0.8);
       z-index: 9999;
-      justify-content: center;
+      backdrop-filter: blur(4px);
+      display: flex;
       align-items: center;
-      font-size: 20px;
-      font-weight: bold;
-      color: #2c3e50;
+      justify-content: center;
+    }
+
+    .spinner-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .spinner-box img {
+      width: 80px;
+      height: auto;
     }
   </style>
 </head>
@@ -205,6 +215,11 @@
   </div>
 
   <!-- Spinner -->
+   <div id="spinner">
+  <div class="spinner-box">
+    <img src="Loading.gif" alt="Loading..." />
+  </div>
+</div>
   
 
   <!-- Main Content -->
